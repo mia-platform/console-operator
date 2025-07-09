@@ -18,4 +18,12 @@ resources:
   kind: Company
   path: github.com/mia-platform/console-operator/api/v1alpha1
   version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: mia-platform.eu
+  group: core
+  kind: Console
+  path: github.com/mia-platform/console-operator/api/v1alpha1
+  version: v1alpha1
 version: "3"
