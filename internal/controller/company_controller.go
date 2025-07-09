@@ -19,12 +19,12 @@ package controller
 import (
 	"context"
 
+	"github.com/go-logr/logr"
+	corev1alpha1 "github.com/mia-platform/console-operator/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	logf "sigs.k8s.io/controller-runtime/pkg/log"
-
-	corev1alpha1 "github.com/mia-platform/console-operator/api/v1alpha1"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 )
 
 // CompanyReconciler reconciles a Company object
@@ -47,9 +47,56 @@ type CompanyReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.21.0/pkg/reconcile
 func (r *CompanyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = logf.FromContext(ctx)
+	log := ctrl.LoggerFrom(ctx, "company", req.NamespacedName)
+	ctx = ctrl.LoggerInto(ctx, log)
+
+	var company corev1alpha1.Company
+	if err := r.Get(ctx, req.NamespacedName, &company); err != nil {
+		log.Error(err, "unable to fetch Company")
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	finalizerName := "console-controller"
+	if company.ObjectMeta.DeletionTimestamp.IsZero() {
+		if !containsString(company.GetFinalizers(), finalizerName) {
+			controllerutil.AddFinalizer(&company, finalizerName)
+			if err := r.Update(ctx, &company); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+	} else {
+		// The object is being deleted
+		if containsString(company.GetFinalizers(), finalizerName) {
+			// if err := r.deleteExternalResources(&company); err != nil {
+			//     return ctrl.Result{}, err
+			// }
+
+			// remove our finalizer from the list and update it.
+			controllerutil.RemoveFinalizer(&company, finalizerName)
+			if err := r.Update(ctx, &company); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+		// Stop reconciliation as the item is being deleted
+		return ctrl.Result{}, nil
+	}
 
 	return ctrl.Result{}, nil
+}
+
+// A helper function to check if a string is present in a slice of strings.
+func containsString(slice []string, s string) bool {
+	for _, item := range slice {
+		if item == s {
+			return true
+		}
+	}
+	return false
+}
+
+func (r *CompanyReconciler) updateCompanyStatus(ctx context.Context, company *corev1alpha1.Company, log *logr.Logger) error {
+	log.Info("Updating Company status")
+	return r.Status().Update(ctx, company)
 }
 
 // SetupWithManager sets up the controller with the Manager.
