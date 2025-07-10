@@ -1,0 +1,27 @@
+rules:
+- apiGroups:
+  - core.mia-platform.eu
+  resources:
+  - companies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.mia-platform.eu
+  resources:
+  - companies/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - core.mia-platform.eu
+  resources:
+  - companies/status
+  verbs:
+  - get
+  - patch
+  - update

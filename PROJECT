@@ -5,25 +5,25 @@
 cliVersion: 4.6.0
 domain: mia-platform.eu
 layout:
-- go.kubebuilder.io/v4
-projectName: console-k8s-operator
+  - go.kubebuilder.io/v4
+projectName: console-operator
 repo: github.com/mia-platform/console-operator
 resources:
-- api:
-    crdVersion: v1
-    namespaced: true
-  controller: true
-  domain: mia-platform.eu
-  group: core
-  kind: Company
-  path: github.com/mia-platform/console-operator/api/v1alpha1
-  version: v1alpha1
-- api:
-    crdVersion: v1
-    namespaced: true
-  domain: mia-platform.eu
-  group: core
-  kind: Console
-  path: github.com/mia-platform/console-operator/api/v1alpha1
-  version: v1alpha1
+  - api:
+      crdVersion: v1
+      namespaced: true
+    controller: true
+    domain: mia-platform.eu
+    group: core
+    kind: Company
+    path: github.com/mia-platform/console-operator/api/v1alpha1
+    version: v1alpha1
+  - api:
+      crdVersion: v1
+      namespaced: true
+    domain: mia-platform.eu
+    group: core
+    kind: Console
+    path: github.com/mia-platform/console-operator/api/v1alpha1
+    version: v1alpha1
 version: "3"

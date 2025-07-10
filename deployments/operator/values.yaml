@@ -1,0 +1,19 @@
+tag: ""
+pullPolicy: "IfNotPresent"
+
+common:
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraArgs: []
+
+consoleOperator:
+  replicas: 1
+  pod:
+    annotations: {}
+    labels: {}
+    extraArgs: []
+    resources:
+      limits: {}
+      requests: {}
+  imageName: "ghcr.io/mia-platform/console-operator"
