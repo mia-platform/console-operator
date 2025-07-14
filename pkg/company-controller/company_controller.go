@@ -20,12 +20,15 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	corev1alpha1 "github.com/mia-platform/console-operator/api/core/v1alpha1"
+	consoleclient "github.com/mia-platform/console-operator/pkg/console-client"
 )
 
 // CompanyReconciler reconciles a Company object
@@ -70,6 +73,52 @@ func (r *CompanyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			}
 		}
 		// Stop reconciliation as the item is being deleted
+		return ctrl.Result{}, nil
+	}
+
+	companyName := company.Spec.Name
+	companyConsoleRef := company.Spec.ConsoleRef
+	var companyConsole corev1alpha1.Console
+	if err := r.Get(ctx, types.NamespacedName{
+		Name:      companyConsoleRef.Name,
+		Namespace: companyConsoleRef.Namespace,
+	}, &companyConsole); err != nil {
+		log.Error(err, "unable to fetch Console for Company", "consoleRef", companyConsoleRef)
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	var clientIdSecret v1.Secret
+	if err := r.Get(ctx, types.NamespacedName{Name: companyConsole.Spec.ClientID.SecretRef, Namespace: companyConsole.Namespace}, &clientIdSecret); err != nil {
+		log.Error(err, "unable to fetch ClientID Secret for Company")
+		return ctrl.Result{}, err
+	}
+
+	var clientKeySecret v1.Secret
+	if err := r.Get(ctx, types.NamespacedName{Name: companyConsole.Spec.ClientSecret.SecretRef, Namespace: companyConsole.Namespace}, &clientKeySecret); err != nil {
+		log.Error(err, "unable to fetch ClientKey Secret for Company")
+		return ctrl.Result{}, err
+	}
+
+	consoleClientConfig := consoleclient.ClientConfig{
+		BaseURL:      companyConsole.Spec.URL,
+		ClientID:     string(clientIdSecret.Data[companyConsole.Spec.ClientID.KeyRef]),
+		ClientSecret: string(clientKeySecret.Data[companyConsole.Spec.ClientSecret.KeyRef]),
+	}
+
+	consoleClient, err := consoleclient.NewClient(consoleClientConfig, ctx)
+	if err != nil {
+		log.Error(err, "failed to create Console client")
+		return ctrl.Result{}, err
+	}
+
+	exists, err := consoleClient.CompanyExists(ctx, companyName)
+	if err != nil {
+		log.Error(err, "failed to check if company exists in Console")
+		return ctrl.Result{}, err
+	}
+
+	if exists {
+		log.Info("Company already exists", "companyName", companyName)
 		return ctrl.Result{}, nil
 	}
 
