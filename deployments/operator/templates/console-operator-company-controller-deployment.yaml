@@ -1,0 +1,78 @@
+{{- $companyControllerConfig := (merge (dict "name" "company-controller" "module" "company-controller") .) -}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    {{- include "operator.labels" $companyControllerConfig | nindent 4 }}
+  name: {{ include "operator.prefixedName" $companyControllerConfig }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.companyController.replicas }}
+  selector:
+    matchLabels:
+      {{- include "operator.labels" $companyControllerConfig | nindent 6 }}
+  template:
+    metadata: 
+    {{ if .Values.companyController.pod.annotations }}
+      annotations:
+        {{- toYaml .Values.companyController.pod.annotations | nindent 8 }}
+    {{ end }}
+      labels:
+        {{- include "operator.labels" $companyControllerConfig | nindent 8 }}
+      {{ if .Values.companyController.pod.labels }}
+        {{ toYaml .Values.companyController.pod.labels | nindent 8 }}
+      {{ end }}
+    spec:
+      {{- if gt .Values.companyController.replicas 1.0 }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  {{- include "operator.labels" $companyControllerConfig | nindent 18 }}
+              topologyKey: kubernetes.io/hostname
+      {{- end }}
+      securityContext:
+        {{- include "operator.podSecurityContext" $companyControllerConfig | nindent 8 }}
+      serviceAccountName: {{ include "operator.prefixedName" $companyControllerConfig }}
+      containers:
+      - image: {{ .Values.companyController.imageName }}:{{ include "operator.version" $companyControllerConfig }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
+        securityContext:
+          {{- include "operator.containerSecurityContext" $companyControllerConfig | nindent 10 }}
+        name: {{ $companyControllerConfig.name }}
+        command: ["/usr/bin/company-controller"]
+        args:
+        resources: {{- toYaml .Values.companyController.pod.resources | nindent 10 }}
+        ports: []
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 10
+      volumes:
+      - name: webhook-certs
+        secret:
+          secretName: {{ include "operator.prefixedName" $companyControllerConfig }}
+      {{- if ((.Values.common).nodeSelector) }}
+      nodeSelector:
+      {{- toYaml .Values.common.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if ((.Values.common).tolerations) }}
+      tolerations:
+      {{- toYaml .Values.common.tolerations | nindent 8 }}
+      {{- end }}
+      {{- if ((.Values.common).affinity) }}
+      affinity:
+      {{- toYaml .Values.common.affinity | nindent 8 }}
+      {{- end }}

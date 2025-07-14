@@ -1,0 +1,31 @@
+{{- $companyControllerConfig := (merge (dict "name" "company-controller" "module" "company-controller") .) -}}
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "operator.prefixedName" $companyControllerConfig }}
+  labels:
+    {{- include "operator.labels" $companyControllerConfig | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "operator.prefixedName" $companyControllerConfig }}
+  labels:
+    {{- include "operator.labels" $companyControllerConfig | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "operator.prefixedName" $companyControllerConfig }}
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "operator.prefixedName" $companyControllerConfig }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "operator.prefixedName" $companyControllerConfig }}
+  labels:
+    {{- include "operator.labels" $companyControllerConfig | nindent 4 }}
+{{ .Files.Get (include "operator.cluster-role-filename" (dict "prefix" ( include "operator.prefixedName" $companyControllerConfig )))}}

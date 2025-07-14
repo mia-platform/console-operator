@@ -27,7 +27,7 @@ manifests: controller-gen
 rbacs: controller-gen
 	rm -f deployments/operator/files/*
 
-	$(CONTROLLER_GEN) paths="./pkg/company-controller" rbac:roleName=operator-company-controller output:rbac:stdout | awk -v RS="---\n" 'NR>1{f="./deployments/operator/files/operator-company-controller-" $$4 ".yaml";printf "%s",$$0 > f; close(f)}' && $(SED_COMMAND) deployments/operator/files/operator-company-controller-ClusterRole.yaml
+	$(CONTROLLER_GEN) paths="./pkg/company-controller" rbac:roleName=console-operator-company-controller output:rbac:stdout | awk -v RS="---\n" 'NR>1{f="./deployments/operator/files/console-operator-company-controller-" $$4 ".yaml";printf "%s",$$0 > f; close(f)}' && $(SED_COMMAND) deployments/operator/files/console-operator-company-controller-ClusterRole.yaml
 
 # Install gci if not available
 gci:

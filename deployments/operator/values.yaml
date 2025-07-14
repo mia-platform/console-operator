@@ -7,7 +7,7 @@ common:
   affinity: {}
   extraArgs: []
 
-consoleOperator:
+companyController:
   replicas: 1
   pod:
     annotations: {}
