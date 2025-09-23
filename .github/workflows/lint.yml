@@ -2,6 +2,10 @@ name: Linting
 on:
   pull_request:
 
+  push:
+    branches:
+      - development
+
 jobs:
   golangci:
     name: Lint golang files
