@@ -192,6 +192,10 @@ func (c *Client) CompanyExists(ctx context.Context, companyName string) (bool, e
 	return false, nil
 }
 
+func (c *Client) CreateCompany(ctx context.Context, company ConsoleCompany) error {
+	return c.PostJSON(ctx, "/api/backend/tenants", company, nil)
+}
+
 // PostJSON is a convenience method that performs POST and unmarshals JSON response
 func (c *Client) PostJSON(ctx context.Context, endpoint string, body interface{}, result interface{}) error {
 	resp, err := c.Post(ctx, endpoint, body)

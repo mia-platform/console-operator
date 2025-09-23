@@ -53,6 +53,8 @@ spec:
                 - name
                 - namespace
                 type: object
+              description:
+                type: string
               name:
                 description: Foo is an example field of Company. Edit company_types.go
                   to remove/update

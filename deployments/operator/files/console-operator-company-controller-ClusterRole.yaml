@@ -1,5 +1,13 @@
 rules:
 - apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - core.mia-platform.eu
   resources:
   - companies
@@ -25,3 +33,11 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - core.mia-platform.eu
+  resources:
+  - console
+  verbs:
+  - get
+  - list
+  - watch

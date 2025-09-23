@@ -30,6 +30,7 @@ type CompanySpec struct {
 
 	// Foo is an example field of Company. Edit company_types.go to remove/update
 	Name          string         `json:"name"`
+	Description   string         `json:"description,omitempty"`
 	CompanyOwners []string       `json:"companyOwners,omitempty"`
 	ConsoleRef    NamespacedName `json:"consoleRef"`
 	// Clusters []string `json:"companyOwners"`

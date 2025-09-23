@@ -38,8 +38,11 @@ type CompanyReconciler struct {
 }
 
 // +kubebuilder:rbac:groups=core.mia-platform.eu,resources=companies,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=core.mia-platform.eu,resources=console,verbs=get;list;watch
 // +kubebuilder:rbac:groups=core.mia-platform.eu,resources=companies/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=core.mia-platform.eu,resources=companies/finalizers,verbs=update
+
+// +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;watch
 
 func (r *CompanyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := ctrl.LoggerFrom(ctx, "company", req.NamespacedName)
@@ -119,10 +122,19 @@ func (r *CompanyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 	if exists {
 		log.Info("Company already exists", "companyName", companyName)
-	} else {
-		log.Info("Company does not exist", "companyName", companyName)
+		return ctrl.Result{}, nil
 	}
 
+	newCompany := consoleclient.ConsoleCompany{
+		Name:        companyName,
+		Description: company.Spec.Description,
+	}
+	if err := consoleClient.CreateCompany(ctx, newCompany); err != nil {
+		log.Error(err, "failed to create company in Console", "companyName", companyName)
+		return ctrl.Result{}, err
+	}
+
+	log.Info("Company created successfully in Console", "companyName", companyName)
 	return ctrl.Result{}, nil
 }
 
