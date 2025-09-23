@@ -1,0 +1,15 @@
+apiVersion: core.mia-platform.eu/v1alpha1
+kind: Console
+metadata:
+  labels:
+    app.kubernetes.io/name: console-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: console-demo
+spec:
+  url: https://demo.console.gcp.mia-platform.eu
+  clientID:
+    secretRef: console-demo-secret
+    keyRef: client-id
+  clientSecret:
+    secretRef: console-demo-secret
+    keyRef: client-secret

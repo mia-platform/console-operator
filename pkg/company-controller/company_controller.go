@@ -119,7 +119,8 @@ func (r *CompanyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 	if exists {
 		log.Info("Company already exists", "companyName", companyName)
-		return ctrl.Result{}, nil
+	} else {
+		log.Info("Company does not exist", "companyName", companyName)
 	}
 
 	return ctrl.Result{}, nil

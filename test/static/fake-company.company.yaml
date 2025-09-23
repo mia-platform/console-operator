@@ -1,0 +1,12 @@
+apiVersion: core.mia-platform.eu/v1alpha1
+kind: Company
+metadata:
+  labels:
+    app.kubernetes.io/name: console-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: fake-company
+spec:
+  consoleRef:
+    name: console-demo
+    namespace: mia-companies-operator
+  name: "Fake Company"

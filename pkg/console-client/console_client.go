@@ -178,7 +178,7 @@ func (c *Client) GetJSON(ctx context.Context, endpoint string, result interface{
 func (c *Client) CompanyExists(ctx context.Context, companyName string) (bool, error) {
 	var companies []ConsoleCompany
 
-	err := c.GetJSON(ctx, "/api/backend/tenants", &companies)
+	err := c.GetJSON(ctx, "/api/backend/tenants/", &companies)
 	if err != nil {
 		return false, fmt.Errorf("failed to get companies: %w", err)
 	}
