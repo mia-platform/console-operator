@@ -1,5 +1,5 @@
-tag: ""
-pullPolicy: "IfNotPresent"
+tag: "0.0.2"
+pullPolicy: "Always"
 
 common:
   nodeSelector: {}

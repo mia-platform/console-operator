@@ -4,10 +4,10 @@ metadata:
   labels:
     app.kubernetes.io/name: console-operator
     app.kubernetes.io/managed-by: kustomize
-  name: company-sample
+  name: company-cloud-engineers
 spec:
   consoleRef:
     name: console-demo
     namespace: mia-companies-operator
-  name: "Demo Live"
-  description: "Demo Live compny, to perform live demos to prospects"
+  name: "Cloud Engineers company v3"
+  description: "Cloud Engineers company, to test the operator"

@@ -38,7 +38,7 @@ type CompanyReconciler struct {
 }
 
 // +kubebuilder:rbac:groups=core.mia-platform.eu,resources=companies,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=core.mia-platform.eu,resources=console,verbs=get;list;watch
+// +kubebuilder:rbac:groups=core.mia-platform.eu,resources=consoles,verbs=get;list;watch
 // +kubebuilder:rbac:groups=core.mia-platform.eu,resources=companies/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=core.mia-platform.eu,resources=companies/finalizers,verbs=update
 
@@ -68,6 +68,9 @@ func (r *CompanyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			// if err := r.deleteExternalResources(&company); err != nil {
 			//     return ctrl.Result{}, err
 			// }
+			log.Info("Deleting the company from Console is not implemented yet, just deleting the k8s resource")
+			r.Delete(ctx, &company)
+			log.Info("Company deleted successfully from k8s", "companyName", company.Spec.Name)
 
 			// remove our finalizer from the list and update it.
 			controllerutil.RemoveFinalizer(&company, finalizerName)
