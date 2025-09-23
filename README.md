@@ -1,5 +1,5 @@
 # console-operator
-// TODO(user): Add simple overview of use/purpose
+Mia-Platform Console operator in order to automate the companies creation operations.
 
 ## Description
 // TODO(user): An in-depth paragraph about your project and overview of use
