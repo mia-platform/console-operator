@@ -41,11 +41,18 @@ type CompanySpec struct {
 type CompanyStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-	CompanyID string `json:"companyID,omitempty"`
+	CompanyId   string `json:"companyId,omitempty"`
+	CompanyName string `json:"companyName,omitempty"`
+	Exists      bool   `json:"exists,omitempty"`
+	Description string `json:"description,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
+// +kubebuilder:printcolumn:name="Exists",type=boolean,JSONPath=`.status.exists`
+// +kubebuilder:printcolumn:name="Company Name",type=string,JSONPath=`.status.companyName`
+// +kubebuilder:printcolumn:name="Company Id",type=string,JSONPath=`.status.companyId`
 
 // Company is the Schema for the companies API.
 type Company struct {

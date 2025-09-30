@@ -117,7 +117,7 @@ func (r *CompanyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, err
 	}
 
-	exists, err := consoleClient.CompanyExists(ctx, companyName)
+	exists, companyId, err := consoleClient.CompanyExists(ctx, companyName)
 	if err != nil {
 		log.Error(err, "failed to check if company exists in Console")
 		return ctrl.Result{}, err
@@ -125,6 +125,13 @@ func (r *CompanyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 
 	if exists {
 		log.Info("Company already exists", "companyName", companyName)
+		company.Status.CompanyId = companyId
+		company.Status.CompanyName = companyName
+		company.Status.Exists = true
+		if err := r.updateCompanyStatus(ctx, &company, &log); err != nil {
+			log.Error(err, "failed to update Company status")
+			return ctrl.Result{}, err
+		}
 		return ctrl.Result{}, nil
 	}
 

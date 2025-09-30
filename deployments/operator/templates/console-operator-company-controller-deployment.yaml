@@ -38,6 +38,8 @@ spec:
       securityContext:
         {{- include "operator.podSecurityContext" $companyControllerConfig | nindent 8 }}
       serviceAccountName: {{ include "operator.prefixedName" $companyControllerConfig }}
+      imagePullSecrets:
+        - name: {{ .Values.imagePullSecret }}
       containers:
       - image: {{ .Values.companyController.imageName }}:{{ include "operator.version" $companyControllerConfig }}
         imagePullPolicy: {{ .Values.pullPolicy }}

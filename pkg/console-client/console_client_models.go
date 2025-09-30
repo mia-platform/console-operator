@@ -47,5 +47,6 @@ type TokenResponse struct {
 type ConsoleCompany struct {
 	Name        string `json:"name"`
 	Description string `json:"description,omitempty"`
+	CompanyId   string `json:"tenantId,omitempty"`
 	// Add other fields as needed based on your API response
 }

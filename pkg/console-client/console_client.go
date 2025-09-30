@@ -175,21 +175,21 @@ func (c *Client) GetJSON(ctx context.Context, endpoint string, result interface{
 	return json.NewDecoder(resp.Body).Decode(result)
 }
 
-func (c *Client) CompanyExists(ctx context.Context, companyName string) (bool, error) {
+func (c *Client) CompanyExists(ctx context.Context, companyName string) (bool, string, error) {
 	var companies []ConsoleCompany
 
 	err := c.GetJSON(ctx, "/api/backend/tenants/", &companies)
 	if err != nil {
-		return false, fmt.Errorf("failed to get companies: %w", err)
+		return false, "", fmt.Errorf("failed to get companies: %w", err)
 	}
 
 	for _, company := range companies {
 		if company.Name == companyName {
-			return true, nil
+			return true, company.CompanyId, nil
 		}
 	}
 
-	return false, nil
+	return false, "", nil
 }
 
 func (c *Client) CreateCompany(ctx context.Context, company ConsoleCompany) error {
