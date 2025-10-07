@@ -20,10 +20,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
+
+	corev1alpha1 "github.com/mia-platform/console-operator/api/core/v1alpha1"
 )
 
 func NewClient(config ClientConfig, ctx context.Context) (*Client, error) {
@@ -192,8 +195,30 @@ func (c *Client) CompanyExists(ctx context.Context, companyName string) (bool, s
 	return false, "", nil
 }
 
-func (c *Client) CreateCompany(ctx context.Context, company ConsoleCompany) error {
-	return c.PostJSON(ctx, "/api/backend/tenants", company, nil)
+func (c *Client) CreateCompany(ctx context.Context, company ConsoleCompany) (string, error) {
+	var result struct {
+		ID        string `json:"_id"`
+		CompanyId string `json:"tenantId"`
+	}
+	c.PostJSON(ctx, "/api/backend/tenants", company, &result)
+	if result.CompanyId != "" {
+		return result.CompanyId, nil
+	}
+	return "", fmt.Errorf("failed to create company")
+}
+
+func (c *Client) AddCompanyOwners(ctx context.Context, company corev1alpha1.Company, companyId string) []error {
+	var companyOwners = company.Spec.CompanyOwners
+	var log = log.Default()
+	var errors []error
+	for _, ownerEmail := range companyOwners {
+		addUserURL := fmt.Sprintf("/api/companies/%s/users", companyId)
+		log.Printf("Adding user %s to company %s. Calling URL %s", ownerEmail, companyId, addUserURL)
+		if err := c.PostJSON(ctx, addUserURL, map[string]string{"email": ownerEmail, "role": "company-owner"}, nil); err != nil {
+			errors = append(errors, err)
+		}
+	}
+	return errors
 }
 
 // PostJSON is a convenience method that performs POST and unmarshals JSON response

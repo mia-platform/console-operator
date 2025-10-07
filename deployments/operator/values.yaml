@@ -1,7 +1,7 @@
-tag: 0.0.3
+tag: 0.0.6
 pullPolicy: Always
 imagePullSecret: ghcr-mia
-ghcrPullSecret: OVERRIDE!!!
+ghcrPullSecretEncoded: OVERRIDE!!!
 
 common:
   nodeSelector: {}

@@ -139,12 +139,27 @@ func (r *CompanyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		Name:        companyName,
 		Description: company.Spec.Description,
 	}
-	if err := consoleClient.CreateCompany(ctx, newCompany); err != nil {
+
+	if companyId, err = consoleClient.CreateCompany(ctx, newCompany); err != nil {
 		log.Error(err, "failed to create company in Console", "companyName", companyName)
 		return ctrl.Result{}, err
 	}
 
-	log.Info("Company created successfully in Console", "companyName", companyName)
+	log.Info("Company created successfully in Console", "companyName", companyName, "companyId", companyId)
+
+	if errors := consoleClient.AddCompanyOwners(ctx, company, companyId); len(errors) > 0 {
+		for _, err := range errors {
+			log.Error(err, "failed to add company owner in Console", "companyName", companyName)
+		}
+	}
+	company.Status.CompanyId = companyId
+	company.Status.CompanyName = companyName
+	company.Status.Exists = true
+	if err := r.updateCompanyStatus(ctx, &company, &log); err != nil {
+		log.Error(err, "failed to update Company status")
+		return ctrl.Result{}, err
+	}
+
 	return ctrl.Result{}, nil
 }
 
