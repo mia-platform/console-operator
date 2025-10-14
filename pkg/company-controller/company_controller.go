@@ -152,6 +152,22 @@ func (r *CompanyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			log.Error(err, "failed to add company owner in Console", "companyName", companyName)
 		}
 	}
+
+	for _, cluster := range company.Spec.Clusters {
+
+		var serviceAccountTokenSecret v1.Secret
+		if err := r.Get(ctx, types.NamespacedName{Name: cluster.Connection.ServiceAccountToken.SecretRef, Namespace: company.Namespace}, &serviceAccountTokenSecret); err != nil {
+			log.Error(err, "unable to fetch cluster service account token Secret for Company")
+			continue
+		}
+		var serviceAccountToken = string(serviceAccountTokenSecret.Data[cluster.Connection.ServiceAccountToken.KeyRef])
+
+		if err := consoleClient.AddCompanyCluster(ctx, cluster, companyId, serviceAccountToken); err != nil {
+			log.Error(err, "failed to add company owner in Console", "companyName", companyName)
+		}
+
+	}
+
 	company.Status.CompanyId = companyId
 	company.Status.CompanyName = companyName
 	company.Status.Exists = true

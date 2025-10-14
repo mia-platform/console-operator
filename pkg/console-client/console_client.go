@@ -221,6 +221,34 @@ func (c *Client) AddCompanyOwners(ctx context.Context, company corev1alpha1.Comp
 	return errors
 }
 
+func (c *Client) AddCompanyCluster(ctx context.Context, cluster corev1alpha1.Cluster, companyId string, serviceAccountToken string) error {
+
+	var log = log.Default()
+	addUserURL := fmt.Sprintf("/api/tenants/%s/clusters/", companyId)
+	var clusterPayload struct {
+		clusterId  string
+		connection struct {
+			url                 string
+			base64CA            string
+			serviceAccountToken string
+		}
+		description string
+	}
+	clusterPayload.clusterId = cluster.ClusterId
+	clusterPayload.description = cluster.Description
+	clusterPayload.connection.base64CA = cluster.Connection.Base64CA
+	clusterPayload.connection.url = cluster.Connection.Url
+	clusterPayload.connection.serviceAccountToken = serviceAccountToken
+
+	log.Printf("Adding cluster %s to company %s. Calling URL %s", cluster.ClusterId, companyId, addUserURL)
+
+	if err := c.PostJSON(ctx, addUserURL, clusterPayload, nil); err != nil {
+		return err
+	}
+	return nil
+
+}
+
 // PostJSON is a convenience method that performs POST and unmarshals JSON response
 func (c *Client) PostJSON(ctx context.Context, endpoint string, body interface{}, result interface{}) error {
 	resp, err := c.Post(ctx, endpoint, body)

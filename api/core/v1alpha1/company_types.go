@@ -22,6 +22,22 @@ import (
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+type Proxy struct {
+	Url string `json:"url"`
+}
+
+type ClusterConnection struct {
+	Url                 string     `json:"url"`
+	Base64CA            string     `json:"base64CA,omitempty"`
+	Proxy               string     `json:"proxy,omitempty"`
+	ServiceAccountToken Credential `json:"serviceAccountToken,omitempty"`
+}
+
+type Cluster struct {
+	ClusterId   string            `json:"clusterId"`
+	Connection  ClusterConnection `json:"clusterConnection"`
+	Description string            `json:"description,omitempty"`
+}
 
 // CompanySpec defines the desired state of Company.
 type CompanySpec struct {
@@ -33,6 +49,7 @@ type CompanySpec struct {
 	Description   string         `json:"description,omitempty"`
 	CompanyOwners []string       `json:"companyOwners,omitempty"`
 	ConsoleRef    NamespacedName `json:"consoleRef"`
+	Clusters      []Cluster      `json:"clusters,omitempty"`
 	// Clusters []string `json:"companyOwners"`
 	// Envs []string `json:"companyOwners"`
 }
