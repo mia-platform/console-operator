@@ -41,7 +41,7 @@ spec:
       imagePullSecrets:
         - name: {{ .Values.imagePullSecret }}
       containers:
-      - image: {{ .Values.companyController.imageName }}:{{ include "operator.version" $companyControllerConfig }}
+      - image: {{ .Values.companyController.imageName }}
         imagePullPolicy: {{ .Values.pullPolicy }}
         securityContext:
           {{- include "operator.containerSecurityContext" $companyControllerConfig | nindent 10 }}

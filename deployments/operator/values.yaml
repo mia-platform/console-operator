@@ -1,4 +1,4 @@
-tag: 0.0.6
+tag: 0.0.7
 pullPolicy: Always
 imagePullSecret: ghcr-mia
 ghcrPullSecretEncoded: OVERRIDE!!!
@@ -18,4 +18,4 @@ companyController:
     resources:
       limits: {}
       requests: {}
-  imageName: "ghcr.io/mia-platform/console-operator"
+  imageName: "ghcr.io/mia-platform/console-operator:0.0.8"

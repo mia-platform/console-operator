@@ -163,7 +163,7 @@ func (r *CompanyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		var serviceAccountToken = string(serviceAccountTokenSecret.Data[cluster.Connection.ServiceAccountToken.KeyRef])
 
 		if err := consoleClient.AddCompanyCluster(ctx, cluster, companyId, serviceAccountToken); err != nil {
-			log.Error(err, "failed to add company owner in Console", "companyName", companyName)
+			log.Error(err, "failed to add company cluster in Console", "companyName", companyName)
 		}
 
 	}

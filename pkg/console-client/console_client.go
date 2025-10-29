@@ -224,7 +224,7 @@ func (c *Client) AddCompanyOwners(ctx context.Context, company corev1alpha1.Comp
 func (c *Client) AddCompanyCluster(ctx context.Context, cluster corev1alpha1.Cluster, companyId string, serviceAccountToken string) error {
 
 	var log = log.Default()
-	addUserURL := fmt.Sprintf("/api/tenants/%s/clusters/", companyId)
+	addClusterURL := fmt.Sprintf("/api/tenants/%s/clusters/", companyId)
 	var clusterPayload struct {
 		clusterId  string
 		connection struct {
@@ -240,9 +240,11 @@ func (c *Client) AddCompanyCluster(ctx context.Context, cluster corev1alpha1.Clu
 	clusterPayload.connection.url = cluster.Connection.Url
 	clusterPayload.connection.serviceAccountToken = serviceAccountToken
 
-	log.Printf("Adding cluster %s to company %s. Calling URL %s", cluster.ClusterId, companyId, addUserURL)
+	log.Printf("Adding cluster %s to company %s. Calling URL %s", cluster.ClusterId, companyId, addClusterURL)
+	log.Printf("Payload %s", clusterPayload)
 
-	if err := c.PostJSON(ctx, addUserURL, clusterPayload, nil); err != nil {
+	if err := c.PostJSON(ctx, addClusterURL, clusterPayload, nil); err != nil {
+		log.Printf("Error %s", err)
 		return err
 	}
 	return nil
