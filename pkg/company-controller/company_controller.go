@@ -191,7 +191,18 @@ func containsString(slice []string, s string) bool {
 
 func (r *CompanyReconciler) updateCompanyStatus(ctx context.Context, company *corev1alpha1.Company, log *logr.Logger) error {
 	log.Info("Updating Company status")
-	return r.Status().Update(ctx, company)
+
+	// Re-fetch the latest version of the company before updating status
+	// to avoid conflicts
+	latest := &corev1alpha1.Company{}
+	if err := r.Get(ctx, client.ObjectKeyFromObject(company), latest); err != nil {
+		return err
+	}
+
+	// Copy the status from the company we want to update
+	latest.Status = company.Status
+
+	return r.Status().Update(ctx, latest)
 }
 
 // SetupWithManager sets up the controller with the Manager.
