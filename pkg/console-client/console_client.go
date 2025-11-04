@@ -221,7 +221,7 @@ func (c *Client) AddCompanyOwners(ctx context.Context, company corev1alpha1.Comp
 	return errors
 }
 
-func (c *Client) AddCompanyCluster(ctx context.Context, cluster corev1alpha1.Cluster, companyId string, serviceAccountToken string) error {
+func (c *Client) AddCompanyCluster(ctx context.Context, cluster corev1alpha1.Cluster, companyId string, serviceAccountToken string) (string, error) {
 
 	var log = log.Default()
 	addClusterURL := fmt.Sprintf("/api/tenants/%s/clusters/", companyId)
@@ -243,12 +243,33 @@ func (c *Client) AddCompanyCluster(ctx context.Context, cluster corev1alpha1.Clu
 	log.Printf("Adding cluster %s to company %s. Calling URL %s", cluster.ClusterId, companyId, addClusterURL)
 	log.Printf("Payload %s", clusterPayload)
 
-	if err := c.PostJSON(ctx, addClusterURL, clusterPayload, nil); err != nil {
-		log.Printf("Error %s", err)
-		return err
+	var result struct {
+		ClusterId string `json:"_id"`
 	}
-	return nil
+	if err := c.PostJSON(ctx, addClusterURL, clusterPayload, &result); err != nil {
+		log.Printf("Error %s", err)
+		return "", err
+	}
 
+	return result.ClusterId, nil
+}
+
+func (c *Client) AddCompanyEnvironments(ctx context.Context, environments []corev1alpha1.Environment, companyId string, clusters map[string]string) error {
+	var log = log.Default()
+	var addEnvPath = fmt.Sprintf("/tenants/%s/project-blueprint/environments", companyId)
+	var environmentsPayload []corev1alpha1.Environment = []corev1alpha1.Environment{}
+	for _, env := range environments {
+		clusterId, exists := clusters[env.Cluster.ClusterId]
+		if exists && clusterId != "" {
+			env.Cluster.ClusterId = clusterId
+			environmentsPayload = append(environmentsPayload, env)
+		} else {
+			log.Fatal("ClusterId not found for environment ", env.EnvId, " with cluster ", env.Cluster.ClusterId)
+		}
+	}
+	log.Printf("Adding environments to company %s. Calling URL %s", companyId, addEnvPath)
+	log.Printf("Payload %+v", environmentsPayload)
+	return c.PostJSON(ctx, addEnvPath, environmentsPayload, nil)
 }
 
 // PostJSON is a convenience method that performs POST and unmarshals JSON response

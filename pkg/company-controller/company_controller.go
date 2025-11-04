@@ -153,8 +153,8 @@ func (r *CompanyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 	}
 
+	var clustersMap map[string]string = make(map[string]string)
 	for _, cluster := range company.Spec.Clusters {
-
 		var serviceAccountTokenSecret v1.Secret
 		if err := r.Get(ctx, types.NamespacedName{Name: cluster.Connection.ServiceAccountToken.SecretRef, Namespace: company.Namespace}, &serviceAccountTokenSecret); err != nil {
 			log.Error(err, "unable to fetch cluster service account token Secret for Company")
@@ -162,10 +162,16 @@ func (r *CompanyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		}
 		var serviceAccountToken = string(serviceAccountTokenSecret.Data[cluster.Connection.ServiceAccountToken.KeyRef])
 
-		if err := consoleClient.AddCompanyCluster(ctx, cluster, companyId, serviceAccountToken); err != nil {
+		if clusterId, err := consoleClient.AddCompanyCluster(ctx, cluster, companyId, serviceAccountToken); err != nil {
 			log.Error(err, "failed to add company cluster in Console", "companyName", companyName)
+		} else {
+			clustersMap[cluster.ClusterId] = clusterId
+			log.Info("Cluster added successfully to Company in Console", "companyName", companyName, "clusterId", clusterId)
 		}
-
+	}
+	log.Info("Clusters map: ", clustersMap)
+	if addEnvironmentsErr := consoleClient.AddCompanyEnvironments(ctx, company.Spec.Environments, companyId, clustersMap); addEnvironmentsErr != nil {
+		log.Error(addEnvironmentsErr, "failed to add company environments in Console", "companyName", companyName)
 	}
 
 	company.Status.CompanyId = companyId

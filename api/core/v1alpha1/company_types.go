@@ -39,6 +39,27 @@ type Cluster struct {
 	Description string            `json:"description,omitempty"`
 }
 
+type Environment struct {
+	Label       string `json:"label"`
+	Description string `json:"description,omitempty"`
+	Hosts       []struct {
+		Scheme       string `json:"scheme"`
+		Host         string `json:"host"`
+		IsBackoffice bool   `json:"isBackoffice"`
+	} `json:"hosts,omitempty"`
+	Cluster struct {
+		ClusterId            string `json:"clusterId"`
+		Namespace            string `json:"namespace"`
+		KubeContextVariables struct {
+			KubeUrl   string `json:"KUBE_URL"`
+			KubeToken string `json:"KUBE_TOKEN"`
+			KubeCAPEM string `json:"KUBE_CA_PEM"`
+		} `json:"kubeContextVariables"`
+	} `json:"cluster"`
+	EnvId     string `json:"envId"`
+	EnvPrefix string `json:"envPrefix"`
+}
+
 // CompanySpec defines the desired state of Company.
 type CompanySpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
@@ -50,8 +71,7 @@ type CompanySpec struct {
 	CompanyOwners []string       `json:"companyOwners,omitempty"`
 	ConsoleRef    NamespacedName `json:"consoleRef"`
 	Clusters      []Cluster      `json:"clusters,omitempty"`
-	// Clusters []string `json:"companyOwners"`
-	// Envs []string `json:"companyOwners"`
+	Environments  []Environment  `json:"environments,omitempty"`
 }
 
 // CompanyStatus defines the observed state of Company.
