@@ -1,7 +1,7 @@
 tag: 0.0.7
 pullPolicy: Always
 imagePullSecret: ghcr-mia
-ghcrPullSecretEncoded: OVERRIDE!!!
+ghcrPullSecretEncoded: eyJhdXRocyI6eyJnaGNyLmlvIjp7InVzZXJuYW1lIjoiY2xvdWQtZW5naW5lZXJzLWd1aWxkIiwicGFzc3dvcmQiOiJnaHBfNm1JQ3FIY2E1WktMa253bVZlNE1ydEhBS05JVDZpNERvVWl3IiwiYXV0aCI6IlkyeHZkV1F0Wlc1bmFXNWxaWEp6TFdkMWFXeGtPbWRvY0Y4MmJVbERjVWhqWVRWYVMweHJibmR0Vm1VMFRYSjBTRUZMVGtsVU5tazBSRzlWYVhjPSJ9fX0=
 
 common:
   nodeSelector: {}
@@ -18,4 +18,4 @@ companyController:
     resources:
       limits: {}
       requests: {}
-  imageName: "ghcr.io/mia-platform/console-operator:0.0.8"
+  imageName: "ghcr.io/mia-platform/console-operator:0.0.11"

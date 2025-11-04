@@ -101,6 +101,63 @@ spec:
                 type: object
               description:
                 type: string
+              environments:
+                items:
+                  properties:
+                    cluster:
+                      properties:
+                        clusterId:
+                          type: string
+                        kubeContextVariables:
+                          properties:
+                            KUBE_CA_PEM:
+                              type: string
+                            KUBE_TOKEN:
+                              type: string
+                            KUBE_URL:
+                              type: string
+                          required:
+                          - KUBE_CA_PEM
+                          - KUBE_TOKEN
+                          - KUBE_URL
+                          type: object
+                        namespace:
+                          type: string
+                      required:
+                      - clusterId
+                      - kubeContextVariables
+                      - namespace
+                      type: object
+                    description:
+                      type: string
+                    envId:
+                      type: string
+                    envPrefix:
+                      type: string
+                    hosts:
+                      items:
+                        properties:
+                          host:
+                            type: string
+                          isBackoffice:
+                            type: boolean
+                          scheme:
+                            type: string
+                        required:
+                        - host
+                        - isBackoffice
+                        - scheme
+                        type: object
+                      type: array
+                    label:
+                      type: string
+                  required:
+                  - cluster
+                  - envId
+                  - envPrefix
+                  - label
+                  type: object
+                type: array
               name:
                 description: Foo is an example field of Company. Edit company_types.go
                   to remove/update
