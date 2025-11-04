@@ -226,19 +226,19 @@ func (c *Client) AddCompanyCluster(ctx context.Context, cluster corev1alpha1.Clu
 	var log = log.Default()
 	addClusterURL := fmt.Sprintf("/api/tenants/%s/clusters/", companyId)
 	var clusterPayload struct {
-		clusterId  string
-		connection struct {
-			url                 string
-			base64CA            string
-			serviceAccountToken string
-		}
-		description string
+		ClusterId  string `json:"clusterId"`
+		Connection struct {
+			Url                 string `json:"url"`
+			Base64CA            string `json:"base64CA"`
+			ServiceAccountToken string `json:"serviceAccountToken"`
+		} `json:"connection"`
+		Description string `json:"description,omitempty"`
 	}
-	clusterPayload.clusterId = cluster.ClusterId
-	clusterPayload.description = cluster.Description
-	clusterPayload.connection.base64CA = cluster.Connection.Base64CA
-	clusterPayload.connection.url = cluster.Connection.Url
-	clusterPayload.connection.serviceAccountToken = serviceAccountToken
+	clusterPayload.ClusterId = cluster.ClusterId
+	clusterPayload.Description = cluster.Description
+	clusterPayload.Connection.Base64CA = cluster.Connection.Base64CA
+	clusterPayload.Connection.Url = cluster.Connection.Url
+	clusterPayload.Connection.ServiceAccountToken = serviceAccountToken
 
 	log.Printf("Adding cluster %s to company %s. Calling URL %s", cluster.ClusterId, companyId, addClusterURL)
 	log.Printf("Payload %s", clusterPayload)
