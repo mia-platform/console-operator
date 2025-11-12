@@ -169,7 +169,7 @@ func (r *CompanyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 			log.Info("Cluster added successfully to Company in Console", "companyName", companyName, "clusterId", clusterId)
 		}
 	}
-	log.Info("Clusters map: ", clustersMap)
+	log.Info("Clusters map: ", "clustersMap", clustersMap)
 	if addEnvironmentsErr := consoleClient.AddCompanyEnvironments(ctx, company.Spec.Environments, companyId, clustersMap); addEnvironmentsErr != nil {
 		log.Error(addEnvironmentsErr, "failed to add company environments in Console", "companyName", companyName)
 	}
