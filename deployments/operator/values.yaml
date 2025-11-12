@@ -18,4 +18,4 @@ companyController:
     resources:
       limits: {}
       requests: {}
-  imageName: "ghcr.io/mia-platform/console-operator:0.0.11"
+  imageName: "ghcr.io/mia-platform/console-operator:0.0.17"

@@ -259,7 +259,7 @@ func (c *Client) AddCompanyCluster(ctx context.Context, cluster corev1alpha1.Clu
 
 func (c *Client) AddCompanyEnvironments(ctx context.Context, environments []corev1alpha1.Environment, companyId string, clusters map[string]string) error {
 	var log = log.Default()
-	var addEnvPath = fmt.Sprintf("/tenants/%s/project-blueprint/environments/", companyId)
+	var addEnvPath = fmt.Sprintf("/api/backend/tenants/%s/project-blueprint/", companyId)
 	var environmentsPayload []corev1alpha1.Environment = []corev1alpha1.Environment{}
 	for _, env := range environments {
 		clusterId, exists := clusters[env.Cluster.ClusterId]
@@ -272,7 +272,10 @@ func (c *Client) AddCompanyEnvironments(ctx context.Context, environments []core
 	}
 	log.Printf("Adding environments to company %s. Calling URL %s", companyId, addEnvPath)
 	log.Printf("Payload %+v", environmentsPayload)
-	return c.PatchJSON(ctx, addEnvPath, environmentsPayload, nil)
+	var payload = map[string][]corev1alpha1.Environment{
+		"environments": environmentsPayload,
+	}
+	return c.PatchJSON(ctx, addEnvPath, payload, nil)
 }
 
 // PostJSON is a convenience method that performs POST and unmarshals JSON response
