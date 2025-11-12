@@ -114,6 +114,9 @@ func (c *Client) Post(ctx context.Context, endpoint string, body interface{}) (*
 	return c.doRequest(ctx, http.MethodPost, endpoint, body)
 }
 
+func (c *Client) Patch(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
+	return c.doRequest(ctx, http.MethodPatch, endpoint, body)
+}
 func (c *Client) Put(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
 	return c.doRequest(ctx, http.MethodPut, endpoint, body)
 }
@@ -256,7 +259,7 @@ func (c *Client) AddCompanyCluster(ctx context.Context, cluster corev1alpha1.Clu
 
 func (c *Client) AddCompanyEnvironments(ctx context.Context, environments []corev1alpha1.Environment, companyId string, clusters map[string]string) error {
 	var log = log.Default()
-	var addEnvPath = fmt.Sprintf("/tenants/%s/project-blueprint/environments", companyId)
+	var addEnvPath = fmt.Sprintf("/tenants/%s/project-blueprint/environments/", companyId)
 	var environmentsPayload []corev1alpha1.Environment = []corev1alpha1.Environment{}
 	for _, env := range environments {
 		clusterId, exists := clusters[env.Cluster.ClusterId]
@@ -269,12 +272,31 @@ func (c *Client) AddCompanyEnvironments(ctx context.Context, environments []core
 	}
 	log.Printf("Adding environments to company %s. Calling URL %s", companyId, addEnvPath)
 	log.Printf("Payload %+v", environmentsPayload)
-	return c.PostJSON(ctx, addEnvPath, environmentsPayload, nil)
+	return c.PatchJSON(ctx, addEnvPath, environmentsPayload, nil)
 }
 
 // PostJSON is a convenience method that performs POST and unmarshals JSON response
 func (c *Client) PostJSON(ctx context.Context, endpoint string, body interface{}, result interface{}) error {
 	resp, err := c.Post(ctx, endpoint, body)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("request failed with status %d: %s", resp.StatusCode, resp.Status)
+	}
+
+	if result != nil {
+		return json.NewDecoder(resp.Body).Decode(result)
+	}
+
+	return nil
+}
+
+// PostJSON is a convenience method that performs POST and unmarshals JSON response
+func (c *Client) PatchJSON(ctx context.Context, endpoint string, body interface{}, result interface{}) error {
+	resp, err := c.Patch(ctx, endpoint, body)
 	if err != nil {
 		return err
 	}
